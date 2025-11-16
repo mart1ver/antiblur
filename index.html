@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antiblur - Evolution Genetique d'Images</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #imageUrl {
+            width: 400px;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #canvas-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .individual-container {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .fitness-score {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        #target-container {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h2>Antiblur - Evolution Genetique d'Images</h2>
+        <div>
+            <input type="text" id="imageUrl" placeholder="URL de l'image cible">
+            <button id="loadBtn" onclick="loadTargetImage()">Charger l'image</button>
+        </div>
+    </div>
+
+    <div id="target-container" style="display: none;">
+        <h3>Image Cible</h3>
+        <div id="target-canvas"></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="individual.js"></script>
+    <script src="sketch.js"></script>
+</body>
+</html>

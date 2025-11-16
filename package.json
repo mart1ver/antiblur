@@ -1,0 +1,18 @@
+{
+  "name": "antiblur",
+  "version": "1.0.0",
+  "description": "Genetic algorithm for image evolution using p5.js",
+  "main": "sketch.js",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["genetic-algorithm", "p5js", "image-evolution"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "geneticalgorithm": "^1.0.3"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
