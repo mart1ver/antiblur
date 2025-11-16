@@ -5,7 +5,8 @@ Projet d'algorithme genetique utilisant p5.js pour faire evoluer des images alea
 ## Fonctionnalites
 
 - Chargement d'une image cible via URL
-- Generation d'une population de 10 images completement aleatoires
+- Generation d'une population d'images completement aleatoires
+- Taille de population configurable (5 a 30 individus, defaut: 10)
 - Calcul du score de fitness pour chaque individu (similarite avec l'image cible)
 - Affichage de chaque individu avec son score de fitness
 - Evolution par generation via crossover des 2 meilleurs individus
@@ -13,8 +14,10 @@ Projet d'algorithme genetique utilisant p5.js pour faire evoluer des images alea
 - Elitisme configurable (preservation des meilleurs individus)
 - Mode evolution automatique avec vitesse reglable
 - Affichage du numero de generation actuel
+- Bouton de reinitialisation pour regenerer la population avec une nouvelle taille
+- Controle de la taille de population via un slider (5 a 30)
 - Controle du taux de mutation via un slider (0% a 10%)
-- Controle du nombre d'elites via un slider (0 a 5)
+- Controle du nombre d'elites via un slider (0 a 10)
 - Controle de la vitesse d'evolution automatique (100ms a 2000ms)
 
 ## Structure du Projet
@@ -43,18 +46,20 @@ Puis ouvrez votre navigateur a l'adresse affichee (generalement http://localhost
 1. Entrez l'URL d'une image cible dans le champ de texte
 2. Cliquez sur "Charger l'image"
 3. L'image cible s'affiche en haut
-4. 10 individus avec des images completement aleatoires sont generes (Generation 0)
+4. Une population d'images completement aleatoires est generee (Generation 0)
 5. Le score de fitness de chaque individu est affiche (0-100%, plus c'est eleve, plus c'est proche de l'image cible)
 6. Ajustez les parametres d'evolution:
+   - Taille de population (5-30, par defaut: 10)
    - Taux de mutation (par defaut: 1%)
    - Nombre d'elites (par defaut: 2)
    - Vitesse d'evolution auto (par defaut: 500ms)
-7. **Mode manuel**: Cliquez sur "Prochaine Generation" pour creer une nouvelle generation manuellement
-8. **Mode automatique**: Cliquez sur "Demarrer Evolution Auto" pour faire evoluer automatiquement
+7. **Reinitialiser**: Cliquez sur "Reinitialiser" apres avoir change la taille de population pour regenerer une nouvelle population aleatoire
+8. **Mode manuel**: Cliquez sur "Prochaine Generation" pour creer une nouvelle generation manuellement
+9. **Mode automatique**: Cliquez sur "Demarrer Evolution Auto" pour faire evoluer automatiquement
    - Cliquez sur "Arreter Evolution Auto" pour arreter
-9. Les elites (meilleurs individus) sont preserves intacts dans chaque generation
-10. Le reste de la population est cree par crossover des 2 meilleurs + mutation
-11. Le numero de generation s'incremente automatiquement
+10. Les elites (meilleurs individus) sont preserves intacts dans chaque generation
+11. Le reste de la population est cree par crossover des 2 meilleurs + mutation
+12. Le numero de generation s'incremente automatiquement
 
 ## Details Techniques
 
@@ -67,10 +72,14 @@ Le fitness est calcule en comparant chaque pixel de l'individu avec le pixel cor
 - Score normalise sur 100% (100% = image identique)
 
 ### Population
-- Taille: 10 individus
+- Taille configurable: 5 a 30 individus (par defaut: 10)
 - Generation initiale: completement aleatoire
-- Tri par fitness decroissant
+- Tri par fitness decroissant apres chaque generation
 - Chaque nouvelle generation est creee par crossover des 2 meilleurs individus
+- Impact de la taille:
+  - Petite population (5-10): Evolution rapide, convergence plus rapide, risque de minimum local
+  - Moyenne population (10-15): Bon equilibre vitesse/diversite (recommande)
+  - Grande population (15-30): Plus de diversite, convergence plus lente, calculs plus lents
 
 ### Crossover
 Pour creer une nouvelle generation:
@@ -117,14 +126,17 @@ Le projet a ete optimise pour eviter les fuites memoire:
 Recommandations:
 - Pour une experience optimale, utilisez des images cibles de taille raisonnable (100x100 a 300x300px)
 - En mode automatique, si le navigateur ralentit, augmentez la vitesse (temps entre generations)
+- Pour de grandes populations (>20), envisagez d'utiliser des images plus petites ou une vitesse d'evolution plus lente
+- La taille de population peut etre ajustee a tout moment (cliquez sur "Reinitialiser" apres modification)
 - Le projet peut maintenant evoluer indefiniment sans planter le navigateur
 
 ## Prochaines Etapes
 
 Les fonctionnalites suivantes pourront etre ajoutees:
 - Selection par tournoi ou roulette
-- Parametres configurables (taille de population, nombre de parents)
+- Selection de plus de 2 parents pour le crossover
 - Visualisation de l'evolution du meilleur fitness au fil des generations
 - Graphique montrant la progression du fitness moyen et meilleur
 - Export de la meilleure image en PNG
 - Sauvegarde/chargement de l'etat de la population
+- Differentes strategies de crossover (uniform, multi-point, etc.)

@@ -1,7 +1,6 @@
 let targetImage = null;
 let targetPixels = null;
 let population = [];
-let populationSize = 10;
 let canvases = [];
 let targetCanvas = null;
 let imageWidth = 0;
@@ -19,6 +18,8 @@ window.addEventListener('DOMContentLoaded', function() {
     const eliteCountValue = document.getElementById('eliteCountValue');
     const autoSpeedSlider = document.getElementById('autoSpeed');
     const autoSpeedValue = document.getElementById('autoSpeedValue');
+    const populationSizeSlider = document.getElementById('populationSize');
+    const populationSizeValue = document.getElementById('populationSizeValue');
 
     mutationRateSlider.addEventListener('input', function() {
         const value = (parseFloat(this.value) * 100).toFixed(1);
@@ -36,6 +37,10 @@ window.addEventListener('DOMContentLoaded', function() {
             stopAutoEvolution();
             startAutoEvolution();
         }
+    });
+
+    populationSizeSlider.addEventListener('input', function() {
+        populationSizeValue.textContent = this.value;
     });
 });
 
@@ -105,6 +110,7 @@ function loadTargetImage() {
 
 // Initialiser la population avec des images aléatoires
 function initializePopulation() {
+    const populationSize = parseInt(document.getElementById('populationSize').value);
     population = [];
     for (let i = 0; i < populationSize; i++) {
         let individual = new Individual(imageWidth, imageHeight);
@@ -114,6 +120,28 @@ function initializePopulation() {
 
     // Trier par fitness décroissant
     population.sort((a, b) => b.fitness - a.fitness);
+}
+
+// Réinitialiser la population avec la nouvelle taille
+function resetPopulation() {
+    if (!isImageLoaded) {
+        return;
+    }
+
+    // Arrêter l'évolution auto si en cours
+    if (isAutoEvolving) {
+        toggleAutoEvolution();
+    }
+
+    // Réinitialiser le compteur de génération
+    generationNumber = 0;
+    updateGenerationLabel();
+
+    // Créer une nouvelle population
+    initializePopulation();
+
+    // Afficher la nouvelle population
+    displayPopulation();
 }
 
 // Afficher l'image cible
@@ -220,6 +248,7 @@ function nextGeneration() {
     // Récupérer les paramètres
     const mutationRate = parseFloat(document.getElementById('mutationRate').value);
     const eliteCount = parseInt(document.getElementById('eliteCount').value);
+    const populationSize = parseInt(document.getElementById('populationSize').value);
 
     // Les 2 meilleurs individus (la population est déjà triée par fitness)
     const parent1 = population[0];
