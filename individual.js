@@ -71,24 +71,45 @@ class Individual {
     mutate(mutationRate) {
         for (let i = 0; i < this.dna.length; i += 4) {
             if (Math.random() < mutationRate) {
-                // Muter un des canaux RGB
-                let channel = Math.floor(Math.random() * 3);
-                this.dna[i + channel] = Math.floor(Math.random() * 256);
+                // 20% de chance de muter tout le pixel (exploration)
+                // 80% de chance de muter un seul canal (ajustement fin)
+                if (Math.random() < 0.2) {
+                    // Muter tout le pixel avec des valeurs complètement aléatoires
+                    this.dna[i] = Math.floor(Math.random() * 256);     // R
+                    this.dna[i + 1] = Math.floor(Math.random() * 256); // G
+                    this.dna[i + 2] = Math.floor(Math.random() * 256); // B
+                } else {
+                    // Muter un seul canal RGB
+                    let channel = Math.floor(Math.random() * 3);
+                    this.dna[i + channel] = Math.floor(Math.random() * 256);
+                }
             }
         }
         this.image = null; // Invalider l'image pour qu'elle soit recréée
     }
 
     // Crossover: combiner l'ADN de deux parents
+    // Utilise un crossover uniforme au niveau des pixels (pas des canaux individuels)
+    // pour mieux préserver la cohérence des couleurs
     static crossover(parent1, parent2) {
         let childDNA = new Array(parent1.dna.length);
-        let midpoint = Math.floor(Math.random() * parent1.dna.length);
 
-        for (let i = 0; i < parent1.dna.length; i++) {
-            if (i < midpoint) {
-                childDNA[i] = parent1.dna[i];
+        // Crossover uniforme : pour chaque pixel, choisir aléatoirement un parent
+        // On itère par blocs de 4 (RGBA) pour garder les pixels intacts
+        for (let i = 0; i < parent1.dna.length; i += 4) {
+            // 50% de chance de prendre le pixel du parent1, 50% du parent2
+            if (Math.random() < 0.5) {
+                // Prendre le pixel complet du parent1
+                childDNA[i] = parent1.dna[i];         // R
+                childDNA[i + 1] = parent1.dna[i + 1]; // G
+                childDNA[i + 2] = parent1.dna[i + 2]; // B
+                childDNA[i + 3] = parent1.dna[i + 3]; // A
             } else {
-                childDNA[i] = parent2.dna[i];
+                // Prendre le pixel complet du parent2
+                childDNA[i] = parent2.dna[i];         // R
+                childDNA[i + 1] = parent2.dna[i + 1]; // G
+                childDNA[i + 2] = parent2.dna[i + 2]; // B
+                childDNA[i + 3] = parent2.dna[i + 3]; // A
             }
         }
 
