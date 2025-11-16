@@ -9,6 +9,17 @@ let imageHeight = 0;
 let isImageLoaded = false;
 let generationNumber = 0;
 
+// Initialiser l'event listener pour le slider de mutation
+window.addEventListener('DOMContentLoaded', function() {
+    const mutationRateSlider = document.getElementById('mutationRate');
+    const mutationRateValue = document.getElementById('mutationRateValue');
+
+    mutationRateSlider.addEventListener('input', function() {
+        const value = (parseFloat(this.value) * 100).toFixed(1);
+        mutationRateValue.textContent = `${value}%`;
+    });
+});
+
 // Fonction appelée depuis le bouton HTML
 function loadTargetImage() {
     const url = document.getElementById('imageUrl').value;
@@ -172,6 +183,9 @@ function nextGeneration() {
     document.getElementById('nextGenBtn').disabled = true;
     document.getElementById('nextGenBtn').textContent = 'Calcul en cours...';
 
+    // Récupérer le taux de mutation
+    const mutationRate = parseFloat(document.getElementById('mutationRate').value);
+
     // Les 2 meilleurs individus (la population est déjà triée par fitness)
     const parent1 = population[0];
     const parent2 = population[1];
@@ -181,6 +195,9 @@ function nextGeneration() {
     for (let i = 0; i < populationSize; i++) {
         // Créer un enfant par crossover des 2 meilleurs parents
         const child = Individual.crossover(parent1, parent2);
+
+        // Appliquer la mutation
+        child.mutate(mutationRate);
 
         // Calculer le fitness de l'enfant
         child.calculateFitness(targetPixels);

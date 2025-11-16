@@ -9,7 +9,9 @@ Projet d'algorithme genetique utilisant p5.js pour faire evoluer des images alea
 - Calcul du score de fitness pour chaque individu (similarite avec l'image cible)
 - Affichage de chaque individu avec son score de fitness
 - Evolution par generation via crossover des 2 meilleurs individus
+- Mutation aleatoire configurable pour introduire de la diversite genetique
 - Affichage du numero de generation actuel
+- Controle du taux de mutation via un slider (0% a 10%)
 
 ## Structure du Projet
 
@@ -39,9 +41,11 @@ Puis ouvrez votre navigateur a l'adresse affichee (generalement http://localhost
 3. L'image cible s'affiche en haut
 4. 10 individus avec des images completement aleatoires sont generes (Generation 0)
 5. Le score de fitness de chaque individu est affiche (0-100%, plus c'est eleve, plus c'est proche de l'image cible)
-6. Cliquez sur "Prochaine Generation" pour creer une nouvelle generation
-7. La nouvelle generation est composee de 10 individus issus du crossover des 2 meilleurs individus
-8. Le numero de generation s'incremente automatiquement
+6. Ajustez le taux de mutation avec le slider (par defaut: 1%)
+7. Cliquez sur "Prochaine Generation" pour creer une nouvelle generation
+8. La nouvelle generation est composee de 10 individus issus du crossover des 2 meilleurs individus
+9. Chaque nouvel individu subit une mutation aleatoire selon le taux defini
+10. Le numero de generation s'incremente automatiquement
 
 ## Details Techniques
 
@@ -66,11 +70,19 @@ Pour creer une nouvelle generation:
 3. Le crossover combine l'ADN des 2 parents a un point de coupure aleatoire
 4. Chaque enfant herite d'une partie de l'ADN de chaque parent
 
+### Mutation
+La mutation introduit de la diversite genetique et permet d'explorer de nouvelles solutions:
+- Chaque individu nouvellement cree subit une mutation
+- Pour chaque pixel, il y a une probabilite (taux de mutation) de modifier un canal RGB
+- Le canal mute prend une valeur aleatoire entre 0 et 255
+- Taux de mutation configurable de 0% a 10% (par defaut: 1%)
+- Un taux faible preserve la convergence, un taux eleve augmente l'exploration
+
 ## Prochaines Etapes
 
 Les fonctionnalites suivantes pourront etre ajoutees:
-- Mutation aleatoire pour introduire de la diversite
 - Selection par tournoi ou roulette
-- Elitisme (garder les meilleurs individus)
-- Parametres configurables (taux de mutation, taille de population)
-- Visualisation de l'evolution du meilleur fitness
+- Elitisme (garder les meilleurs individus intacts)
+- Parametres configurables (taille de population, nombre de parents)
+- Visualisation de l'evolution du meilleur fitness au fil des generations
+- Mode evolution automatique (generations successives sans cliquer)
