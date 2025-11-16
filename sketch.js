@@ -7,6 +7,7 @@ let targetCanvas = null;
 let imageWidth = 0;
 let imageHeight = 0;
 let isImageLoaded = false;
+let generationNumber = 0;
 
 // Fonction appelée depuis le bouton HTML
 function loadTargetImage() {
@@ -47,10 +48,13 @@ function loadTargetImage() {
                     displayPopulation();
 
                     isImageLoaded = true;
+                    generationNumber = 0;
+                    updateGenerationLabel();
 
                     document.getElementById('loadBtn').disabled = false;
                     document.getElementById('loadBtn').textContent = 'Charger l\'image';
                     document.getElementById('target-container').style.display = 'block';
+                    document.getElementById('evolution-controls').style.display = 'block';
 
                     // Nettoyer le sketch temporaire
                     p.remove();
@@ -153,12 +157,51 @@ function displayPopulation() {
     }
 }
 
-// Fonction pour évoluer la population (à implémenter plus tard)
-function evolvePopulation() {
+// Mettre à jour le label de génération
+function updateGenerationLabel() {
+    document.getElementById('generation-label').textContent = `Generation: ${generationNumber}`;
+}
+
+// Créer la prochaine génération
+function nextGeneration() {
     if (!isImageLoaded) {
         return;
     }
 
-    // Sélection, crossover, mutation...
-    // À implémenter dans une prochaine étape
+    // Désactiver le bouton pendant le traitement
+    document.getElementById('nextGenBtn').disabled = true;
+    document.getElementById('nextGenBtn').textContent = 'Calcul en cours...';
+
+    // Les 2 meilleurs individus (la population est déjà triée par fitness)
+    const parent1 = population[0];
+    const parent2 = population[1];
+
+    // Créer une nouvelle population de 10 individus via crossover
+    const newPopulation = [];
+    for (let i = 0; i < populationSize; i++) {
+        // Créer un enfant par crossover des 2 meilleurs parents
+        const child = Individual.crossover(parent1, parent2);
+
+        // Calculer le fitness de l'enfant
+        child.calculateFitness(targetPixels);
+
+        newPopulation.push(child);
+    }
+
+    // Remplacer l'ancienne population
+    population = newPopulation;
+
+    // Trier par fitness décroissant
+    population.sort((a, b) => b.fitness - a.fitness);
+
+    // Incrémenter le numéro de génération
+    generationNumber++;
+    updateGenerationLabel();
+
+    // Afficher la nouvelle population
+    displayPopulation();
+
+    // Réactiver le bouton
+    document.getElementById('nextGenBtn').disabled = false;
+    document.getElementById('nextGenBtn').textContent = 'Prochaine Generation';
 }

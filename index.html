@@ -80,6 +80,10 @@
             <input type="text" id="imageUrl" placeholder="URL de l'image cible">
             <button id="loadBtn" onclick="loadTargetImage()">Charger l'image</button>
         </div>
+        <div id="evolution-controls" style="display: none; margin-top: 15px;">
+            <button id="nextGenBtn" onclick="nextGeneration()">Prochaine Generation</button>
+            <span id="generation-label" style="margin-left: 15px; font-weight: bold; color: #333;">Generation: 0</span>
+        </div>
     </div>
 
     <div id="target-container" style="display: none;">
