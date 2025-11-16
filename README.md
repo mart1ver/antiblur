@@ -107,6 +107,18 @@ Mode pour faire evoluer la population automatiquement:
 - Permet d'observer l'evolution en temps reel
 - Utile pour faire evoluer rapidement sur de nombreuses generations
 
+### Optimisations et Performances
+Le projet a ete optimise pour eviter les fuites memoire:
+- Les sketches p5.js sont correctement supprimes entre chaque generation
+- Utilisation de `remove()` sur les anciens sketches avant d'en creer de nouveaux
+- Cela permet de faire evoluer la population pendant des centaines de generations sans ralentissement
+- Pour les tres grandes images (>500x500px), l'evolution peut etre plus lente en mode automatique
+
+Recommandations:
+- Pour une experience optimale, utilisez des images cibles de taille raisonnable (100x100 a 300x300px)
+- En mode automatique, si le navigateur ralentit, augmentez la vitesse (temps entre generations)
+- Le projet peut maintenant evoluer indefiniment sans planter le navigateur
+
 ## Prochaines Etapes
 
 Les fonctionnalites suivantes pourront etre ajoutees:

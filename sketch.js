@@ -118,6 +118,12 @@ function initializePopulation() {
 
 // Afficher l'image cible
 function displayTargetImage() {
+    // Supprimer l'ancien sketch si il existe
+    if (targetCanvas) {
+        // Le targetCanvas est en fait un p5.Renderer, on doit supprimer le sketch parent
+        // On va simplement recréer le conteneur
+    }
+
     // Nettoyer le conteneur
     const container = document.getElementById('target-canvas');
     container.innerHTML = '';
@@ -140,6 +146,13 @@ function displayTargetImage() {
 
 // Afficher la population
 function displayPopulation() {
+    // IMPORTANT: Supprimer les anciens sketches p5 pour éviter les fuites mémoire
+    for (let i = 0; i < canvases.length; i++) {
+        if (canvases[i]) {
+            canvases[i].remove();
+        }
+    }
+
     // Nettoyer le conteneur
     const container = document.getElementById('canvas-container');
     container.innerHTML = '';
