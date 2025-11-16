@@ -233,6 +233,19 @@ function updateGenerationLabel() {
     document.getElementById('generation-label').textContent = `Generation: ${generationNumber}`;
 }
 
+// Sélection par tournoi: choisir le meilleur parmi N candidats aléatoires
+function tournamentSelection(pop, tournamentSize = 3) {
+    let best = null;
+    for (let i = 0; i < tournamentSize; i++) {
+        const randomIndex = Math.floor(Math.random() * pop.length);
+        const candidate = pop[randomIndex];
+        if (!best || candidate.fitness > best.fitness) {
+            best = candidate;
+        }
+    }
+    return best;
+}
+
 // Créer la prochaine génération
 function nextGeneration() {
     if (!isImageLoaded) {
@@ -250,10 +263,6 @@ function nextGeneration() {
     const eliteCount = parseInt(document.getElementById('eliteCount').value);
     const populationSize = parseInt(document.getElementById('populationSize').value);
 
-    // Les 2 meilleurs individus (la population est déjà triée par fitness)
-    const parent1 = population[0];
-    const parent2 = population[1];
-
     // Créer une nouvelle population
     const newPopulation = [];
 
@@ -264,9 +273,14 @@ function nextGeneration() {
     }
 
     // Étape 2: Créer le reste de la population via crossover + mutation
+    // IMPORTANT: Utiliser la sélection par tournoi pour choisir des parents différents
     const remainingSlots = populationSize - eliteCount;
     for (let i = 0; i < remainingSlots; i++) {
-        // Créer un enfant par crossover des 2 meilleurs parents
+        // Sélectionner 2 parents via tournoi (peuvent être différents à chaque fois)
+        const parent1 = tournamentSelection(population);
+        const parent2 = tournamentSelection(population);
+
+        // Créer un enfant par crossover
         const child = Individual.crossover(parent1, parent2);
 
         // Appliquer la mutation

@@ -86,9 +86,20 @@ Le fitness est calcule en comparant chaque pixel de l'individu avec le pixel cor
   - Moyenne population (10-15): Bon equilibre vitesse/diversite (recommande)
   - Grande population (15-30): Plus de diversite, convergence plus lente, calculs plus lents
 
+### Selection
+Selection par tournoi pour choisir les parents:
+- Pour chaque enfant a creer, 2 parents sont selectionnes independamment
+- Selection par tournoi: prendre 3 individus au hasard, garder le meilleur
+- Avantages:
+  - Diversite genetique maximale (parents differents pour chaque enfant)
+  - Les meilleurs individus ont plus de chances d'etre selectionnes
+  - Evite le goulot d'etranglement genetique
+- Avant: tous les enfants venaient des 2 memes parents (probleme!)
+- Maintenant: chaque enfant peut avoir des parents differents
+
 ### Crossover
 Pour creer une nouvelle generation:
-1. Les 2 meilleurs individus sont selectionnes (fitness le plus eleve)
+1. Pour chaque enfant: selection de 2 parents par tournoi
 2. Nouveaux individus crees via crossover uniforme de ces 2 parents
 3. Le crossover uniforme au niveau des pixels:
    - Pour chaque pixel, 50% de chance de venir du parent1 ou du parent2
@@ -140,12 +151,29 @@ Le projet a ete optimise pour eviter les fuites memoire:
 - Pour les tres grandes images (>500x500px), l'evolution peut etre plus lente en mode automatique
 
 #### Ameliorations algorithmiques
-Version optimisee avec crossover uniforme et mutation hybride:
-- **Probleme resolu**: Le crossover a un point unique limitait le fitness a ~55%
-- **Solution**: Crossover uniforme au niveau des pixels + mutation hybride
-- **Resultats**: Convergence beaucoup plus rapide, peut atteindre >90% de fitness
-- Le crossover uniforme melange mieux les caracteristiques des deux parents
-- La mutation hybride equilibre exploration (nouveaux pixels) et exploitation (ajustements fins)
+Version optimisee avec selection par tournoi, crossover uniforme et mutation hybride:
+
+**Probleme 1 - Goulot d'etranglement genetique** (CRITIQUE):
+- Avant: Tous les enfants crees a partir des 2 memes parents
+- Consequence: Diversite genetique quasi-nulle, convergence impossible
+- Solution: Selection par tournoi - parents differents pour chaque enfant
+- Impact: MAJEUR - permet enfin la convergence au-dela de 55%
+
+**Probleme 2 - Crossover inefficace**:
+- Avant: Crossover a un point unique coupait au milieu des pixels
+- Consequence: Combinaisons incoh erentes, fitness plafonnat
+- Solution: Crossover uniforme au niveau des pixels
+- Impact: Meilleur melange des caracteristiques
+
+**Probleme 3 - Mutation limitee**:
+- Avant: Mutation d'un seul canal RGB
+- Solution: Mutation hybride (20% pixel entier, 80% un canal)
+- Impact: Equilibre exploration/exploitation
+
+**Resultats**:
+- Convergence possible au-dela de 90% de fitness
+- Evolution progressive et stable
+- Pas de plateau a 55%
 
 Recommandations:
 - Pour une experience optimale, utilisez des images cibles de taille raisonnable (100x100 a 300x300px)
