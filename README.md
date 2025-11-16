@@ -10,8 +10,12 @@ Projet d'algorithme genetique utilisant p5.js pour faire evoluer des images alea
 - Affichage de chaque individu avec son score de fitness
 - Evolution par generation via crossover des 2 meilleurs individus
 - Mutation aleatoire configurable pour introduire de la diversite genetique
+- Elitisme configurable (preservation des meilleurs individus)
+- Mode evolution automatique avec vitesse reglable
 - Affichage du numero de generation actuel
 - Controle du taux de mutation via un slider (0% a 10%)
+- Controle du nombre d'elites via un slider (0 a 5)
+- Controle de la vitesse d'evolution automatique (100ms a 2000ms)
 
 ## Structure du Projet
 
@@ -41,11 +45,16 @@ Puis ouvrez votre navigateur a l'adresse affichee (generalement http://localhost
 3. L'image cible s'affiche en haut
 4. 10 individus avec des images completement aleatoires sont generes (Generation 0)
 5. Le score de fitness de chaque individu est affiche (0-100%, plus c'est eleve, plus c'est proche de l'image cible)
-6. Ajustez le taux de mutation avec le slider (par defaut: 1%)
-7. Cliquez sur "Prochaine Generation" pour creer une nouvelle generation
-8. La nouvelle generation est composee de 10 individus issus du crossover des 2 meilleurs individus
-9. Chaque nouvel individu subit une mutation aleatoire selon le taux defini
-10. Le numero de generation s'incremente automatiquement
+6. Ajustez les parametres d'evolution:
+   - Taux de mutation (par defaut: 1%)
+   - Nombre d'elites (par defaut: 2)
+   - Vitesse d'evolution auto (par defaut: 500ms)
+7. **Mode manuel**: Cliquez sur "Prochaine Generation" pour creer une nouvelle generation manuellement
+8. **Mode automatique**: Cliquez sur "Demarrer Evolution Auto" pour faire evoluer automatiquement
+   - Cliquez sur "Arreter Evolution Auto" pour arreter
+9. Les elites (meilleurs individus) sont preserves intacts dans chaque generation
+10. Le reste de la population est cree par crossover des 2 meilleurs + mutation
+11. Le numero de generation s'incremente automatiquement
 
 ## Details Techniques
 
@@ -78,11 +87,32 @@ La mutation introduit de la diversite genetique et permet d'explorer de nouvelle
 - Taux de mutation configurable de 0% a 10% (par defaut: 1%)
 - Un taux faible preserve la convergence, un taux eleve augmente l'exploration
 
+### Elitisme
+L'elitisme preserve les meilleurs individus d'une generation a l'autre:
+- Configurable de 0 a 5 individus (par defaut: 2)
+- Les elites sont clones sans modification dans la nouvelle generation
+- Le reste de la population est cree par crossover + mutation
+- Avantages:
+  - Garantit que le meilleur fitness ne diminue jamais
+  - Accelere la convergence
+  - Preserve les bonnes solutions trouvees
+- Avec 0 elite: exploration maximale, convergence plus lente
+- Avec 5 elites: convergence rapide, risque de stagnation
+
+### Evolution Automatique
+Mode pour faire evoluer la population automatiquement:
+- Vitesse reglable de 100ms a 2000ms entre chaque generation
+- Bouton pour demarrer/arreter l'evolution
+- Le bouton manuel est desactive pendant l'evolution automatique
+- Permet d'observer l'evolution en temps reel
+- Utile pour faire evoluer rapidement sur de nombreuses generations
+
 ## Prochaines Etapes
 
 Les fonctionnalites suivantes pourront etre ajoutees:
 - Selection par tournoi ou roulette
-- Elitisme (garder les meilleurs individus intacts)
 - Parametres configurables (taille de population, nombre de parents)
 - Visualisation de l'evolution du meilleur fitness au fil des generations
-- Mode evolution automatique (generations successives sans cliquer)
+- Graphique montrant la progression du fitness moyen et meilleur
+- Export de la meilleure image en PNG
+- Sauvegarde/chargement de l'etat de la population

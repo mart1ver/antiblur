@@ -81,12 +81,25 @@
             <button id="loadBtn" onclick="loadTargetImage()">Charger l'image</button>
         </div>
         <div id="evolution-controls" style="display: none; margin-top: 15px;">
-            <button id="nextGenBtn" onclick="nextGeneration()">Prochaine Generation</button>
-            <span id="generation-label" style="margin-left: 15px; font-weight: bold; color: #333;">Generation: 0</span>
+            <div style="margin-bottom: 10px;">
+                <button id="nextGenBtn" onclick="nextGeneration()">Prochaine Generation</button>
+                <button id="autoEvolveBtn" onclick="toggleAutoEvolution()" style="margin-left: 10px; background-color: #2196F3;">Demarrer Evolution Auto</button>
+                <span id="generation-label" style="margin-left: 15px; font-weight: bold; color: #333;">Generation: 0</span>
+            </div>
             <div style="margin-top: 10px;">
                 <label for="mutationRate" style="color: #333; font-size: 14px;">Taux de mutation:</label>
                 <input type="range" id="mutationRate" min="0" max="0.1" step="0.001" value="0.01" style="width: 200px; margin: 0 10px;">
                 <span id="mutationRateValue" style="color: #666; font-size: 14px;">1%</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="eliteCount" style="color: #333; font-size: 14px;">Nombre d'elites:</label>
+                <input type="range" id="eliteCount" min="0" max="5" step="1" value="2" style="width: 200px; margin: 0 10px;">
+                <span id="eliteCountValue" style="color: #666; font-size: 14px;">2</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="autoSpeed" style="color: #333; font-size: 14px;">Vitesse evolution auto:</label>
+                <input type="range" id="autoSpeed" min="100" max="2000" step="100" value="500" style="width: 200px; margin: 0 10px;">
+                <span id="autoSpeedValue" style="color: #666; font-size: 14px;">500ms</span>
             </div>
         </div>
     </div>
