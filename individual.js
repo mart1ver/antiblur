@@ -24,25 +24,28 @@ class Individual {
 
     // Calculer le fitness en comparant avec l'image cible
     calculateFitness(targetPixels) {
-        let sum = 0;
-        let maxDiff = 0;
+        let totalDiff = 0;
+        let pixelCount = 0;
 
         // Comparer chaque pixel avec l'image cible
         for (let i = 0; i < this.dna.length; i += 4) {
-            // Calculer la différence pour R, G, B
-            let dr = this.dna[i] - targetPixels[i];
-            let dg = this.dna[i + 1] - targetPixels[i + 1];
-            let db = this.dna[i + 2] - targetPixels[i + 2];
+            // Calculer la différence absolue pour chaque canal
+            let dr = Math.abs(this.dna[i] - targetPixels[i]);
+            let dg = Math.abs(this.dna[i + 1] - targetPixels[i + 1]);
+            let db = Math.abs(this.dna[i + 2] - targetPixels[i + 2]);
 
-            // Distance euclidienne pour ce pixel
-            let pixelDiff = Math.sqrt(dr * dr + dg * dg + db * db);
-            sum += pixelDiff;
-            maxDiff += Math.sqrt(255 * 255 * 3); // Distance max possible
+            // Somme des différences pour ce pixel (Manhattan distance)
+            // Plus simple et plus efficace que la distance euclidienne
+            totalDiff += dr + dg + db;
+            pixelCount++;
         }
 
-        // Fitness = 100% - (différence moyenne / différence max)
-        // Plus le fitness est élevé, plus l'image est proche de la cible
-        this.fitness = 100 * (1 - (sum / maxDiff));
+        // Différence maximale possible = 255 * 3 par pixel (R+G+B)
+        let maxPossible = pixelCount * 255 * 3;
+
+        // Fitness = 100% * (1 - différence_réelle / différence_max)
+        // 100% = image identique, 0% = image complètement différente
+        this.fitness = 100 * (1 - (totalDiff / maxPossible));
         return this.fitness;
     }
 

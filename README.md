@@ -68,8 +68,13 @@ L'ADN de chaque individu est un tableau de valeurs RGB correspondant a chaque pi
 
 ### Calcul de Fitness
 Le fitness est calcule en comparant chaque pixel de l'individu avec le pixel correspondant de l'image cible:
-- Distance euclidienne dans l'espace RGB pour chaque pixel
-- Score normalise sur 100% (100% = image identique)
+- Distance de Manhattan (somme des differences absolues) pour chaque canal RGB
+- Formule: pour chaque pixel, diff = |R1-R2| + |G1-G2| + |B1-B2|
+- Somme totale divisee par la difference maximale possible (pixels × 255 × 3)
+- Score normalise sur 100%: fitness = 100 × (1 - diff_totale / diff_max)
+- 100% = image parfaitement identique
+- 0% = image completement differente
+- Avantage sur la distance euclidienne: plus rapide et tout aussi efficace
 
 ### Population
 - Taille configurable: 5 a 30 individus (par defaut: 10)
