@@ -231,6 +231,12 @@ function displayPopulation() {
 // Mettre à jour le label de génération
 function updateGenerationLabel() {
     document.getElementById('generation-label').textContent = `Generation: ${generationNumber}`;
+
+    // Mettre à jour le meilleur fitness
+    if (population.length > 0) {
+        const bestFitness = population[0].fitness;
+        document.getElementById('best-fitness-label').textContent = `Meilleur: ${bestFitness.toFixed(2)}%`;
+    }
 }
 
 // Sélection par tournoi: choisir le meilleur parmi N candidats aléatoires
