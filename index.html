@@ -1,1 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puissance 4</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      font-family: 'Segoe UI', sans-serif;
+      color: #eee;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+      color: #e94560;
+    }
+
+    #status {
+      font-size: 1.2rem;
+      margin-bottom: 1.2rem;
+      min-height: 1.8rem;
+      font-weight: 600;
+    }
+
+    .indicator {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+
+    #board-wrapper {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .cell {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #0f3460;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s;
+      position: relative;
+    }
+
+    .cell:hover {
+      transform: scale(1.07);
+    }
+
+    .cell.red {
+      background: #e94560;
+      box-shadow: 0 0 14px rgba(233,69,96,0.7);
+    }
+
+    .cell.yellow {
+      background: #f5d020;
+      box-shadow: 0 0 14px rgba(245,208,32,0.7);
+    }
+
+    .cell.win {
+      animation: pulse 0.6s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.15); }
+    }
+
+    #controls {
+      margin-top: 1.4rem;
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      opacity: 0.85;
+      transform: translateY(-2px);
+    }
+
+    #btn-reset {
+      background: #e94560;
+      color: #fff;
+    }
+
+    #btn-mode {
+      background: #0f3460;
+      color: #eee;
+      border: 2px solid #e94560;
+    }
+
+    #scores {
+      margin-top: 1rem;
+      display: flex;
+      gap: 32px;
+      font-size: 1rem;
+    }
+
+    .score-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Puissance 4</h1>
+
+<div id="status"></div>
+
+<div id="board-wrapper">
+  <div id="board"></div>
+</div>
+
+<div id="controls">
+  <button id="btn-reset">Rejouer</button>
+  <button id="btn-mode">Mode : 2 joueurs</button>
+</div>
+
+<div id="scores">
+  <div class="score-box">
+    <span class="indicator" style="background:#e94560"></span>
+    <span>Rouge</span>
+    <span class="score-num" id="score-red">0</span>
+  </div>
+  <div class="score-box">
+    <span class="indicator" style="background:#f5d020"></span>
+    <span>Jaune</span>
+    <span class="score-num" id="score-yellow">0</span>
+  </div>
+</div>
+
+<script>
+  const ROWS = 6;
+  const COLS = 7;
+
+  let board, currentPlayer, gameOver, vsAI, scores;
+
+  const boardEl      = document.getElementById('board');
+  const statusEl     = document.getElementById('status');
+  const btnReset     = document.getElementById('btn-reset');
+  const btnMode      = document.getElementById('btn-mode');
+  const scoreRedEl   = document.getElementById('score-red');
+  const scoreYellowEl= document.getElementById('score-yellow');
+
+  scores = { red: 0, yellow: 0 };
+  vsAI   = false;
+
+  // ─── Init ───────────────────────────────────────────────────────────────────
+
+  function init() {
+    board         = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    currentPlayer = 'red';
+    gameOver      = false;
+    renderBoard();
+    updateStatus();
+  }
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
+  function renderBoard() {
+    boardEl.innerHTML = '';
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell' + (board[r][c] ? ' ' + board[r][c] : '');
+        cell.dataset.col = c;
+        cell.addEventListener('click', onCellClick);
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function updateStatus(winner, draw) {
+    if (draw) {
+      statusEl.innerHTML = 'Match nul !';
+      return;
+    }
+    if (winner) {
+      const color = winner === 'red' ? '#e94560' : '#f5d020';
+      const name  = winner === 'red' ? 'Rouge' : 'Jaune';
+      statusEl.innerHTML =
+        `<span class="indicator" style="background:${color}"></span>${name} gagne !`;
+      return;
+    }
+    const color = currentPlayer === 'red' ? '#e94560' : '#f5d020';
+    const name  = currentPlayer === 'red'
+      ? 'Rouge'
+      : (vsAI ? 'IA' : 'Jaune');
+    statusEl.innerHTML =
+      `<span class="indicator" style="background:${color}"></span>Tour de ${name}`;
+  }
+
+  function highlightWin(cells) {
+    cells.forEach(([r, c]) => {
+      boardEl.children[r * COLS + c].classList.add('win');
+    });
+  }
+
+  // ─── Game logic ─────────────────────────────────────────────────────────────
+
+  function dropDisc(col) {
+    for (let r = ROWS - 1; r >= 0; r--) {
+      if (!board[r][col]) {
+        board[r][col] = currentPlayer;
+        return r;
+      }
+    }
+    return -1; // column full
+  }
+
+  function checkWin(player) {
+    // horizontal
+    for (let r = 0; r < ROWS; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        if ([0,1,2,3].every(i => board[r][c+i] === player))
+          return [[r,c],[r,c+1],[r,c+2],[r,c+3]];
+    // vertical
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 0; c < COLS; c++)
+        if ([0,1,2,3].every(i => board[r+i][c] === player))
+          return [[r,c],[r+1,c],[r+2,c],[r+3,c]];
+    // diagonal ↘
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        if ([0,1,2,3].every(i => board[r+i][c+i] === player))
+          return [[r,c],[r+1,c+1],[r+2,c+2],[r+3,c+3]];
+    // diagonal ↙
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 3; c < COLS; c++)
+        if ([0,1,2,3].every(i => board[r+i][c-i] === player))
+          return [[r,c],[r+1,c-1],[r+2,c-2],[r+3,c-3]];
+    return null;
+  }
+
+  function isBoardFull() {
+    return board[0].every(cell => cell !== null);
+  }
+
+  function playTurn(col) {
+    if (gameOver) return;
+    const row = dropDisc(col);
+    if (row === -1) return; // full column
+
+    renderBoard();
+
+    const winCells = checkWin(currentPlayer);
+    if (winCells) {
+      gameOver = true;
+      highlightWin(winCells);
+      updateStatus(currentPlayer);
+      scores[currentPlayer]++;
+      updateScores();
+      return;
+    }
+    if (isBoardFull()) {
+      gameOver = true;
+      updateStatus(null, true);
+      return;
+    }
+
+    currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+    updateStatus();
+
+    if (vsAI && currentPlayer === 'yellow') {
+      boardEl.style.pointerEvents = 'none';
+      setTimeout(() => {
+        aiPlay();
+        boardEl.style.pointerEvents = '';
+      }, 350);
+    }
+  }
+
+  // ─── Events ─────────────────────────────────────────────────────────────────
+
+  function onCellClick(e) {
+    if (gameOver) return;
+    if (vsAI && currentPlayer === 'yellow') return;
+    const col = parseInt(e.currentTarget.dataset.col);
+    playTurn(col);
+  }
+
+  btnReset.addEventListener('click', init);
+
+  btnMode.addEventListener('click', () => {
+    vsAI = !vsAI;
+    btnMode.textContent = vsAI ? 'Mode : vs IA' : 'Mode : 2 joueurs';
+    init();
+  });
+
+  function updateScores() {
+    scoreRedEl.textContent    = scores.red;
+    scoreYellowEl.textContent = scores.yellow;
+  }
+
+  // ─── AI (minimax avec alpha-beta, depth 5) ──────────────────────────────────
+
+  function aiPlay() {
+    const col = bestMove();
+    playTurn(col);
+  }
+
+  function getValidCols() {
+    return Array.from({ length: COLS }, (_, i) => i)
+      .filter(c => board[0][c] === null);
+  }
+
+  function simulateDrop(b, col, player) {
+    for (let r = ROWS - 1; r >= 0; r--) {
+      if (!b[r][col]) { b[r][col] = player; return r; }
+    }
+    return -1;
+  }
+
+  function score4(window, player) {
+    const opp   = player === 'yellow' ? 'red' : 'yellow';
+    const mine  = window.filter(c => c === player).length;
+    const empty = window.filter(c => c === null).length;
+    const theirs= window.filter(c => c === opp).length;
+    if (mine === 4) return 100;
+    if (mine === 3 && empty === 1) return 5;
+    if (mine === 2 && empty === 2) return 2;
+    if (theirs === 3 && empty === 1) return -4;
+    return 0;
+  }
+
+  function heuristic(b, player) {
+    let s = 0;
+    // center column preference
+    const center = b.map(r => r[3]).filter(c => c === player).length;
+    s += center * 3;
+    // horizontal
+    for (let r = 0; r < ROWS; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        s += score4([b[r][c], b[r][c+1], b[r][c+2], b[r][c+3]], player);
+    // vertical
+    for (let c = 0; c < COLS; c++)
+      for (let r = 0; r <= ROWS - 4; r++)
+        s += score4([b[r][c], b[r+1][c], b[r+2][c], b[r+3][c]], player);
+    // diag ↘
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        s += score4([b[r][c],b[r+1][c+1],b[r+2][c+2],b[r+3][c+3]], player);
+    // diag ↙
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 3; c < COLS; c++)
+        s += score4([b[r][c],b[r+1][c-1],b[r+2][c-2],b[r+3][c-3]], player);
+    return s;
+  }
+
+  function checkWinBoard(b, player) {
+    for (let r = 0; r < ROWS; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        if ([0,1,2,3].every(i => b[r][c+i] === player)) return true;
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 0; c < COLS; c++)
+        if ([0,1,2,3].every(i => b[r+i][c] === player)) return true;
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 0; c <= COLS - 4; c++)
+        if ([0,1,2,3].every(i => b[r+i][c+i] === player)) return true;
+    for (let r = 0; r <= ROWS - 4; r++)
+      for (let c = 3; c < COLS; c++)
+        if ([0,1,2,3].every(i => b[r+i][c-i] === player)) return true;
+    return false;
+  }
+
+  function cloneBoard(b) {
+    return b.map(r => [...r]);
+  }
+
+  function minimax(b, depth, alpha, beta, maximizing) {
+    const validCols = Array.from({ length: COLS }, (_, i) => i)
+      .filter(c => b[0][c] === null);
+    const terminal = checkWinBoard(b, 'yellow') || checkWinBoard(b, 'red')
+      || validCols.length === 0;
+
+    if (depth === 0 || terminal) {
+      if (checkWinBoard(b, 'yellow')) return { score: 1000000 };
+      if (checkWinBoard(b, 'red'))    return { score: -1000000 };
+      if (validCols.length === 0)     return { score: 0 };
+      return { score: heuristic(b, 'yellow') };
+    }
+
+    const player = maximizing ? 'yellow' : 'red';
+    let best = maximizing ? -Infinity : Infinity;
+    let bestCol = validCols[Math.floor(validCols.length / 2)];
+
+    for (const col of validCols) {
+      const nb = cloneBoard(b);
+      simulateDrop(nb, col, player);
+      const { score } = minimax(nb, depth - 1, alpha, beta, !maximizing);
+
+      if (maximizing) {
+        if (score > best) { best = score; bestCol = col; }
+        alpha = Math.max(alpha, best);
+      } else {
+        if (score < best) { best = score; bestCol = col; }
+        beta = Math.min(beta, best);
+      }
+      if (beta <= alpha) break;
+    }
+    return { score: best, col: bestCol };
+  }
+
+  function bestMove() {
+    const { col } = minimax(cloneBoard(board), 5, -Infinity, Infinity, true);
+    return col;
+  }
+
+  // ─── Start ──────────────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
